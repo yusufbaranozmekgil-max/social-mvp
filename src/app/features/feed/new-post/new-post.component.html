@@ -1,0 +1,17 @@
+<div class="new-post">
+  <textarea
+    name="content"
+    placeholder="Ne düşünüyorsun?"
+    rows="3"
+    [(ngModel)]="content"></textarea>
+
+  <input
+    type="text"
+    name="photoUrl"
+    placeholder="Fotoğraf URL (opsiyonel)"
+    [(ngModel)]="photoUrl" />
+
+  <button (click)="submit()" [disabled]="!content.trim()">
+    Paylaş
+  </button>
+</div>

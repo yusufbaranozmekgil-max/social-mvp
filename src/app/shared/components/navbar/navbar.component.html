@@ -1,0 +1,15 @@
+<nav class="navbar" *ngIf="currentUser$ | async as user">
+  <div class="brand">
+    <a routerLink="/feed">SocialMVP</a>
+  </div>
+
+  <div class="links">
+    <a routerLink="/feed" routerLinkActive="active">Feed</a>
+    <a [routerLink]="['/profile', user.username]" routerLinkActive="active">Profil</a>
+  </div>
+
+  <div class="user">
+    <span class="username">{{ '@' + user.username }}</span>
+    <button class="logout" (click)="logout()">Çıkış</button>
+  </div>
+</nav>

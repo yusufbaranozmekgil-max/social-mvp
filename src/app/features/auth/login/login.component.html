@@ -1,0 +1,23 @@
+<div class="auth-container">
+  <form class="auth-card" (ngSubmit)="onSubmit()" #f="ngForm">
+    <h2>Giriş Yap</h2>
+
+    <label>
+      Kullanıcı Adı
+      <input type="text" name="username" [(ngModel)]="username" required />
+    </label>
+
+    <label>
+      Şifre
+      <input type="password" name="password" [(ngModel)]="password" required />
+    </label>
+
+    <p class="error" *ngIf="error">{{ error }}</p>
+
+    <button type="submit" [disabled]="f.invalid">Giriş Yap</button>
+
+    <p class="switch">
+      Hesabın yok mu? <a routerLink="/register">Kayıt Ol</a>
+    </p>
+  </form>
+</div>

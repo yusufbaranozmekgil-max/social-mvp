@@ -1,0 +1,12 @@
+<div class="feed">
+  <app-new-post (postCreated)="loadPosts()"></app-new-post>
+
+  <div *ngIf="posts.length === 0" class="empty">
+    Henüz hiç post yok. İlk postu sen paylaş!
+  </div>
+
+  <app-post-card
+    *ngFor="let post of posts"
+    [post]="post">
+  </app-post-card>
+</div>

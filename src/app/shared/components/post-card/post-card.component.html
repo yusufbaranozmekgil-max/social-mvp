@@ -1,0 +1,37 @@
+<article class="post-card">
+  <header class="post-header">
+    <a [routerLink]="['/profile', post.authorUsername]" class="author">
+      {{ '@' + post.authorUsername }}
+    </a>
+    <span class="time">{{ post.createdAt | date:'short' }}</span>
+  </header>
+
+  <p class="content">{{ post.content }}</p>
+
+  <img *ngIf="post.photoUrl" [src]="post.photoUrl" alt="post" class="photo" />
+
+  <div class="actions">
+    <button (click)="toggleLike()" [class.liked]="isLiked">
+      {{ isLiked ? '♥' : '♡' }} {{ post.likes.length }}
+    </button>
+    <span class="count">{{ post.comments.length }} yorum</span>
+  </div>
+
+  <section class="comments" *ngIf="post.comments.length">
+    <div *ngFor="let c of post.comments" class="comment">
+      <a [routerLink]="['/profile', c.authorUsername]" class="author-sm">
+        {{ '@' + c.authorUsername }}
+      </a>
+      <span class="comment-text">{{ c.content }}</span>
+    </div>
+  </section>
+
+  <form class="comment-form" (ngSubmit)="submitComment()">
+    <input
+      type="text"
+      name="comment"
+      placeholder="Yorum yaz..."
+      [(ngModel)]="commentText" />
+    <button type="submit" [disabled]="!commentText.trim()">Gönder</button>
+  </form>
+</article>

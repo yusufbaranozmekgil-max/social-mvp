@@ -1,0 +1,28 @@
+<div class="auth-container">
+  <form class="auth-card" (ngSubmit)="onSubmit()" #f="ngForm">
+    <h2>Kayıt Ol</h2>
+
+    <label>
+      Kullanıcı Adı
+      <input type="text" name="username" [(ngModel)]="username" required />
+    </label>
+
+    <label>
+      E-posta
+      <input type="email" name="email" [(ngModel)]="email" required />
+    </label>
+
+    <label>
+      Şifre
+      <input type="password" name="password" [(ngModel)]="password" required />
+    </label>
+
+    <p class="error" *ngIf="error">{{ error }}</p>
+
+    <button type="submit" [disabled]="f.invalid">Kayıt Ol</button>
+
+    <p class="switch">
+      Zaten hesabın var mı? <a routerLink="/login">Giriş Yap</a>
+    </p>
+  </form>
+</div>
