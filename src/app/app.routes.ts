@@ -28,6 +28,22 @@ export const routes: Routes = [
         m => m.ProfilePageComponent
       )
   },
+  {
+    path: 'notifications',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/notifications/notifications-page/notifications-page.component').then(
+        m => m.NotificationsPageComponent
+      )
+  },
+  {
+    path: 'settings',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/settings/settings-page/settings-page.component').then(
+        m => m.SettingsPageComponent
+      )
+  },
 
   { path: '**', redirectTo: 'feed' }
 ];

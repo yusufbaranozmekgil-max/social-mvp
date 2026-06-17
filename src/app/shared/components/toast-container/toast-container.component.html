@@ -1,0 +1,10 @@
+<div class="toast-stack" *ngIf="toasts$ | async as toasts">
+  <div
+    *ngFor="let t of toasts"
+    class="toast"
+    [attr.data-type]="t.type"
+    (click)="dismiss(t.id)">
+    <span class="material-symbols-rounded">{{ iconFor(t.type) }}</span>
+    <span class="msg">{{ t.message }}</span>
+  </div>
+</div>

@@ -1,66 +1,134 @@
-<div class="profile-container" *ngIf="notFound">
-  <div class="not-found">Kullanıcı bulunamadı.</div>
+<div class="profile-shell" *ngIf="notFound">
+  <div class="not-found">
+    <span class="material-symbols-rounded">person_off</span>
+    <p>Kullanıcı bulunamadı.</p>
+  </div>
 </div>
 
-<div class="profile-container" *ngIf="user as u">
+<div class="profile-shell" *ngIf="user as u">
   <header class="profile-header">
-    <img
-      *ngIf="u.profilePhotoUrl; else avatarPlaceholder"
-      [src]="u.profilePhotoUrl"
-      alt="profile"
-      class="avatar" />
-    <ng-template #avatarPlaceholder>
-      <div class="avatar placeholder">{{ u.username[0].toUpperCase() }}</div>
-    </ng-template>
+    <div class="cover"></div>
+
+    <div class="head-inner">
+      <ng-container *ngIf="u.profilePhotoUrl; else avatarPlaceholder">
+        <img [src]="u.profilePhotoUrl" alt="" class="avatar" />
+      </ng-container>
+      <ng-template #avatarPlaceholder>
+        <div class="avatar letter">{{ u.username[0].toUpperCase() }}</div>
+      </ng-template>
+
+      <div class="actions">
+        <button
+          *ngIf="isOwnProfile && !editing"
+          class="ghost-btn"
+          (click)="startEdit()">
+          <span class="material-symbols-rounded">edit</span>
+          Profili Düzenle
+        </button>
+
+        <button
+          *ngIf="!isOwnProfile"
+          class="follow-btn"
+          [class.following]="isFollowing"
+          [class.pending]="hasPendingRequest"
+          (click)="followAction()">
+          <span class="material-symbols-rounded">
+            {{ isFollowing ? 'how_to_reg' : (hasPendingRequest ? 'schedule' : 'person_add') }}
+          </span>
+          {{ isFollowing ? 'Takipten Çık' : (hasPendingRequest ? 'İstek Gönderildi' : 'Takip Et') }}
+        </button>
+      </div>
+    </div>
 
     <div class="info">
-      <h2>{{ '@' + u.username }}</h2>
-      <p class="bio">{{ u.bio || 'Henüz bio eklenmemiş.' }}</p>
+      <h1>
+        {{ '@' + u.username }}
+        <span class="material-symbols-rounded lock-ico" *ngIf="u.isPrivate" title="Gizli hesap">lock</span>
+      </h1>
+      <p class="bio">
+        <ng-container *ngIf="u.bio; else noBio">
+          <app-formatted-text [text]="u.bio"></app-formatted-text>
+        </ng-container>
+        <ng-template #noBio>Henüz bio eklenmemiş.</ng-template>
+      </p>
 
       <div class="stats">
         <span><strong>{{ followingCount }}</strong> takip</span>
+        <span class="dot">·</span>
         <span><strong>{{ followerCount }}</strong> takipçi</span>
       </div>
-
-      <button
-        *ngIf="isOwnProfile && !editing"
-        class="edit-btn"
-        (click)="startEdit()">
-        Profili Düzenle
-      </button>
-
-      <button
-        *ngIf="!isOwnProfile"
-        class="follow-btn"
-        [class.following]="isFollowing"
-        (click)="toggleFollow()">
-        {{ isFollowing ? 'Takipten Çık' : 'Takip Et' }}
-      </button>
     </div>
   </header>
 
-  <section class="edit-form" *ngIf="editing">
-    <label>
-      Bio
+  <section class="edit-card" *ngIf="editing">
+    <h3>Profili Düzenle</h3>
+
+    <label class="field">
+      <div class="label-row">
+        <span class="label">Bio</span>
+        <button
+          type="button"
+          class="link-danger"
+          *ngIf="user?.bio"
+          (click)="clearBio()">
+          <span class="material-symbols-rounded">delete</span>
+          Sil
+        </button>
+      </div>
       <textarea name="editBio" rows="3" [(ngModel)]="editBio"></textarea>
     </label>
 
-    <label>
-      Profil Fotoğrafı URL
-      <input type="text" name="editPhotoUrl" [(ngModel)]="editPhotoUrl" />
+    <label class="field">
+      <div class="label-row">
+        <span class="label">Profil Fotoğrafı URL</span>
+        <button
+          type="button"
+          class="link-danger"
+          *ngIf="user?.profilePhotoUrl"
+          (click)="clearPhoto()">
+          <span class="material-symbols-rounded">delete</span>
+          Sil
+        </button>
+      </div>
+      <div class="input-wrap">
+        <span class="material-symbols-rounded">image</span>
+        <input type="text" name="editPhotoUrl" [(ngModel)]="editPhotoUrl" />
+      </div>
     </label>
 
     <div class="edit-actions">
-      <button class="cancel" (click)="cancelEdit()">İptal</button>
-      <button class="save" (click)="saveEdit()">Kaydet</button>
+      <button class="ghost-btn" (click)="cancelEdit()">İptal</button>
+      <button class="primary-btn" (click)="saveEdit()">
+        <span class="material-symbols-rounded">check</span>
+        Kaydet
+      </button>
     </div>
   </section>
 
-  <section class="posts">
-    <h3>Paylaşımlar</h3>
+  <section class="posts" *ngIf="canSeeContent">
+    <h2>Paylaşımlar</h2>
     <div *ngIf="posts.length === 0" class="empty">
+      <span class="material-symbols-rounded">inbox</span>
       Henüz post paylaşılmamış.
     </div>
-    <app-post-card *ngFor="let post of posts" [post]="post"></app-post-card>
+    <app-post-card
+      *ngFor="let post of visiblePosts"
+      [post]="post"
+      (postDeleted)="onPostDeleted($event)">
+    </app-post-card>
+
+    <button
+      *ngIf="hasMorePosts"
+      class="load-more"
+      (click)="loadMorePosts()">
+      <span class="material-symbols-rounded">expand_more</span>
+      Daha fazla yükle
+    </button>
+  </section>
+
+  <section class="locked" *ngIf="!canSeeContent">
+    <span class="material-symbols-rounded">lock</span>
+    <h3>Bu hesap gizli</h3>
+    <p>Paylaşımları görmek için takip etmen gerekiyor.</p>
   </section>
 </div>

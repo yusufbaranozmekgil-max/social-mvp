@@ -1,17 +1,70 @@
-<div class="new-post">
-  <textarea
-    name="content"
-    placeholder="Ne düşünüyorsun?"
-    rows="3"
-    [(ngModel)]="content"></textarea>
+<div class="composer">
+  <div class="composer-head">
+    <span class="material-symbols-rounded">edit_note</span>
+    <span class="title">Yeni Paylaşım</span>
+  </div>
 
-  <input
-    type="text"
-    name="photoUrl"
-    placeholder="Fotoğraf URL (opsiyonel)"
-    [(ngModel)]="photoUrl" />
+  <div class="text-area-wrap">
+    <app-mention-input
+      [text]="content"
+      (textChange)="content = $event"
+      [multiline]="true"
+      variant="textarea"
+      placeholder="Ne düşünüyorsun?"
+      [rows]="3"
+      [maxlength]="maxChars"
+      name="content">
+    </app-mention-input>
+    <span class="char-counter">{{ remaining }}</span>
+  </div>
 
-  <button (click)="submit()" [disabled]="!content.trim()">
-    Paylaş
-  </button>
+  <div class="photo-row">
+    <span class="material-symbols-rounded">image</span>
+    <input
+      type="text"
+      name="photoUrl"
+      placeholder="Fotoğraf URL ekle"
+      [(ngModel)]="draftPhotoUrl"
+      (keydown.enter)="$event.preventDefault(); addPhoto()"
+      [disabled]="photoUrls.length >= maxPhotos" />
+    <button
+      type="button"
+      class="add-btn"
+      (click)="addPhoto()"
+      [disabled]="!draftPhotoUrl.trim() || photoUrls.length >= maxPhotos"
+      title="Ekle">
+      <span class="material-symbols-rounded">add</span>
+    </button>
+  </div>
+
+  <div class="photo-grid" *ngIf="photoUrls.length">
+    <div class="photo-thumb" *ngFor="let url of photoUrls; let i = index">
+      <img [src]="url" alt="" />
+      <button
+        type="button"
+        class="remove-btn"
+        (click)="removePhoto(i)"
+        title="Kaldır">
+        <span class="material-symbols-rounded">close</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="error" *ngIf="error">
+    <span class="material-symbols-rounded">error</span>
+    {{ error }}
+  </div>
+
+  <div class="actions">
+    <span class="photo-counter" [class.full]="photoUrls.length >= maxPhotos">
+      {{ photoUrls.length }} / {{ maxPhotos }} fotoğraf
+    </span>
+    <button
+      class="primary-btn"
+      (click)="submit()"
+      [disabled]="!content.trim()">
+      <span class="material-symbols-rounded">send</span>
+      Paylaş
+    </button>
+  </div>
 </div>

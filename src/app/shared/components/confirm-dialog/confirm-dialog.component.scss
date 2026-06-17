@@ -1,0 +1,120 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+  z-index: 100;
+  animation: fade 160ms ease;
+}
+
+.dialog {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  width: 100%;
+  max-width: 380px;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-2);
+  animation: pop 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--primary-soft);
+  color: var(--primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--space-2);
+
+  .material-symbols-rounded {
+    font-size: 28px;
+  }
+
+  &.danger {
+    background: var(--danger-soft);
+    color: var(--danger);
+  }
+}
+
+h3 {
+  margin: 0;
+  font-size: 17px;
+  letter-spacing: -0.01em;
+}
+
+p {
+  margin: 0 0 var(--space-3);
+  font-size: 14px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.actions {
+  display: flex;
+  width: 100%;
+  gap: var(--space-2);
+}
+
+.ghost-btn,
+.confirm-btn {
+  flex: 1;
+  padding: 10px 16px;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 14px;
+  border: 1px solid transparent;
+  transition: background 160ms ease, transform 80ms ease;
+
+  &:active {
+    transform: translateY(1px);
+  }
+}
+
+.ghost-btn {
+  background: var(--surface);
+  color: var(--text);
+  border-color: var(--border-strong);
+
+  &:hover {
+    background: var(--surface-alt);
+  }
+}
+
+.confirm-btn {
+  background: var(--primary);
+  color: #fff;
+
+  &:hover {
+    background: var(--primary-hover);
+  }
+
+  &.danger {
+    background: var(--danger);
+
+    &:hover {
+      background: #be123c;
+    }
+  }
+}
+
+@keyframes fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes pop {
+  from { opacity: 0; transform: translateY(8px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}

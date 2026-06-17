@@ -1,15 +1,101 @@
 <nav class="navbar" *ngIf="currentUser$ | async as user">
-  <div class="brand">
-    <a routerLink="/feed">SocialMVP</a>
-  </div>
+  <div class="inner">
+    <a routerLink="/feed" class="brand">
+      <span class="material-symbols-rounded brand-icon">share</span>
+      <span class="brand-text">SocialMVP</span>
+    </a>
 
-  <div class="links">
-    <a routerLink="/feed" routerLinkActive="active">Feed</a>
-    <a [routerLink]="['/profile', user.username]" routerLinkActive="active">Profil</a>
-  </div>
+    <div class="links">
+      <a routerLink="/feed" routerLinkActive="active" class="nav-link">
+        <span class="material-symbols-rounded">home</span>
+        <span>Akış</span>
+      </a>
+      <a [routerLink]="['/profile', user.username]" routerLinkActive="active" class="nav-link">
+        <span class="material-symbols-rounded">person</span>
+        <span>Profil</span>
+      </a>
 
-  <div class="user">
-    <span class="username">{{ '@' + user.username }}</span>
-    <button class="logout" (click)="logout()">Çıkış</button>
+      <div class="search-wrap">
+        <div class="search-input">
+          <span class="material-symbols-rounded">search</span>
+          <input
+            type="text"
+            placeholder="Kullanıcı ara..."
+            [(ngModel)]="searchQuery"
+            (input)="onSearchInput()"
+            (focus)="onSearchFocus()" />
+          <button
+            type="button"
+            class="clear"
+            *ngIf="searchQuery"
+            (click)="closeSearch()"
+            title="Temizle">
+            <span class="material-symbols-rounded">close</span>
+          </button>
+        </div>
+
+        <div class="dropdown" *ngIf="showDropdown && searchQuery.trim()">
+          <button
+            *ngFor="let u of searchResults"
+            type="button"
+            class="result"
+            (click)="selectResult(u.username)">
+            <div class="avatar-sm" *ngIf="u.profilePhotoUrl; else letterRes">
+              <img [src]="u.profilePhotoUrl" alt="" />
+            </div>
+            <ng-template #letterRes>
+              <div class="avatar-sm letter">{{ u.username[0].toUpperCase() }}</div>
+            </ng-template>
+            <div class="info">
+              <span class="username">{{ '@' + u.username }}</span>
+              <span class="bio" *ngIf="u.bio">{{ u.bio }}</span>
+            </div>
+          </button>
+
+          <div class="no-results" *ngIf="!searchResults.length">
+            <span class="material-symbols-rounded">person_search</span>
+            Kullanıcı bulunamadı
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="user">
+      <div class="user-chip">
+        <ng-container *ngIf="user.profilePhotoUrl; else letterSm">
+          <img class="avatar-sm" [src]="user.profilePhotoUrl" alt="" />
+        </ng-container>
+        <ng-template #letterSm>
+          <div class="avatar-sm letter">{{ user.username[0].toUpperCase() }}</div>
+        </ng-template>
+        <span class="username">{{ '@' + user.username }}</span>
+      </div>
+
+      <button
+        type="button"
+        class="bell"
+        (click)="onBellClick()"
+        title="Bildirimler">
+        <span class="material-symbols-rounded">mail</span>
+        <span
+          class="badge"
+          *ngIf="unreadCount(user) as count"
+          [class.hide]="count === 0">
+          {{ count > 9 ? '9+' : count }}
+        </span>
+      </button>
+
+      <button
+        type="button"
+        class="bell"
+        (click)="onSettingsClick()"
+        title="Ayarlar">
+        <span class="material-symbols-rounded">settings</span>
+      </button>
+
+      <button class="logout" (click)="logout()" title="Çıkış">
+        <span class="material-symbols-rounded">logout</span>
+      </button>
+    </div>
   </div>
 </nav>

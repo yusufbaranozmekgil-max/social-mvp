@@ -1,23 +1,50 @@
-<div class="auth-container">
-  <form class="auth-card" (ngSubmit)="onSubmit()" #f="ngForm">
-    <h2>Giriş Yap</h2>
+<div class="auth-shell">
+  <div class="auth-card">
+    <div class="auth-brand">
+      <span class="material-symbols-rounded">share</span>
+    </div>
+    <h1>Tekrar hoş geldin</h1>
+    <p class="subtitle">Hesabına giriş yap ve akışına dön.</p>
 
-    <label>
-      Kullanıcı Adı
-      <input type="text" name="username" [(ngModel)]="username" required />
-    </label>
+    <form (ngSubmit)="onSubmit()" #f="ngForm" class="auth-form">
+      <label class="field">
+        <span class="label">Kullanıcı adı</span>
+        <div class="input-wrap">
+          <span class="material-symbols-rounded">person</span>
+          <input
+            type="text"
+            name="username"
+            [(ngModel)]="username"
+            autocomplete="username"
+            required />
+        </div>
+      </label>
 
-    <label>
-      Şifre
-      <input type="password" name="password" [(ngModel)]="password" required />
-    </label>
+      <label class="field">
+        <span class="label">Şifre</span>
+        <div class="input-wrap">
+          <span class="material-symbols-rounded">lock</span>
+          <input
+            type="password"
+            name="password"
+            [(ngModel)]="password"
+            autocomplete="current-password"
+            required />
+        </div>
+      </label>
 
-    <p class="error" *ngIf="error">{{ error }}</p>
+      <div class="error" *ngIf="error">
+        <span class="material-symbols-rounded">error</span>
+        {{ error }}
+      </div>
 
-    <button type="submit" [disabled]="f.invalid">Giriş Yap</button>
+      <button type="submit" class="primary-btn" [disabled]="f.invalid">
+        Giriş Yap
+      </button>
+    </form>
 
     <p class="switch">
-      Hesabın yok mu? <a routerLink="/register">Kayıt Ol</a>
+      Hesabın yok mu? <a routerLink="/register">Kayıt ol</a>
     </p>
-  </form>
+  </div>
 </div>

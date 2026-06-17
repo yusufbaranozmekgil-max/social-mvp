@@ -1,0 +1,44 @@
+<div class="mention-wrap" [attr.data-variant]="variant">
+  <textarea
+    *ngIf="multiline; else inlineInput"
+    #field
+    [value]="text"
+    [placeholder]="placeholder"
+    [rows]="rows"
+    [attr.maxlength]="maxlength"
+    [attr.name]="name"
+    (input)="onInput($event)"
+    (keydown)="onKeyDown($event)"
+    (blur)="onBlur()"></textarea>
+
+  <ng-template #inlineInput>
+    <input
+      #field
+      type="text"
+      [value]="text"
+      [placeholder]="placeholder"
+      [attr.maxlength]="maxlength"
+      [attr.name]="name"
+      (input)="onInput($event)"
+      (keydown)="onKeyDown($event)"
+      (blur)="onBlur()" />
+  </ng-template>
+
+  <div class="suggestions" *ngIf="showSuggestions">
+    <button
+      *ngFor="let u of suggestions; let i = index"
+      type="button"
+      class="suggestion"
+      [class.active]="i === activeIndex"
+      (mousedown)="$event.preventDefault()"
+      (click)="select(u)">
+      <ng-container *ngIf="u.profilePhotoUrl; else letterSm">
+        <img class="avatar-sm" [src]="u.profilePhotoUrl" alt="" />
+      </ng-container>
+      <ng-template #letterSm>
+        <div class="avatar-sm letter">{{ u.username[0].toUpperCase() }}</div>
+      </ng-template>
+      <span class="uname">{{ '@' + u.username }}</span>
+    </button>
+  </div>
+</div>

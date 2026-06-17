@@ -1,0 +1,90 @@
+<div class="notif-shell">
+  <header class="head">
+    <h1>
+      <span class="material-symbols-rounded">notifications</span>
+      Bildirimler
+    </h1>
+    <button
+      class="clear-all"
+      *ngIf="notifications.length"
+      (click)="clearAll()"
+      title="Tümünü Temizle">
+      <span class="material-symbols-rounded">delete_sweep</span>
+      Temizle
+    </button>
+  </header>
+
+  <section *ngIf="pendingRequests.length" class="requests">
+    <h2>Takip İstekleri ({{ pendingRequests.length }})</h2>
+    <div class="req-card" *ngFor="let req of visibleRequests">
+      <a [routerLink]="['/profile', req]" class="req-user">
+        <div class="avatar letter">{{ req[0].toUpperCase() }}</div>
+        <div class="meta">
+          <span class="username">{{ '@' + req }}</span>
+          <span class="sub">seni takip etmek istiyor</span>
+        </div>
+      </a>
+      <div class="req-actions">
+        <button class="primary-btn" (click)="accept(req)">
+          <span class="material-symbols-rounded">check</span>
+          Kabul Et
+        </button>
+        <button class="ghost-btn" (click)="reject(req)">
+          <span class="material-symbols-rounded">close</span>
+          Reddet
+        </button>
+      </div>
+    </div>
+
+    <button
+      *ngIf="hasMoreRequests"
+      class="load-more"
+      (click)="loadMoreRequests()">
+      <span class="material-symbols-rounded">expand_more</span>
+      Daha fazla yükle
+    </button>
+  </section>
+
+  <section class="feed-notifs">
+    <h2 *ngIf="notifications.length">Aktivite</h2>
+    <div
+      *ngIf="!notifications.length && !pendingRequests.length"
+      class="empty">
+      <span class="material-symbols-rounded">inbox</span>
+      Henüz bir bildirim yok.
+    </div>
+
+    <a
+      *ngFor="let n of visibleNotifications"
+      class="notif-item"
+      [routerLink]="['/profile', n.fromUsername]">
+      <div class="icon" [attr.data-type]="n.type">
+        <span class="material-symbols-rounded">{{ iconFor(n.type) }}</span>
+      </div>
+      <div class="content">
+        <p class="line">
+          <span class="username">{{ '@' + n.fromUsername }}</span>
+          <span class="text">{{ textFor(n) }}</span>
+        </p>
+        <span class="excerpt" *ngIf="n.excerpt">"{{ n.excerpt }}"</span>
+        <span class="time" [title]="n.timestamp | date:'medium'">
+          {{ n.timestamp | naturalTime }}
+        </span>
+      </div>
+      <button
+        class="remove-x"
+        (click)="remove($event, n.id)"
+        title="Sil">
+        <span class="material-symbols-rounded">close</span>
+      </button>
+    </a>
+
+    <button
+      *ngIf="hasMoreNotifications"
+      class="load-more"
+      (click)="loadMoreNotifications()">
+      <span class="material-symbols-rounded">expand_more</span>
+      Daha fazla yükle
+    </button>
+  </section>
+</div>

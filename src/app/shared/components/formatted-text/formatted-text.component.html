@@ -1,0 +1,12 @@
+<ng-container *ngFor="let seg of segments">
+  <ng-container [ngSwitch]="seg.type">
+    <a
+      *ngSwitchCase="'mention'"
+      class="mention"
+      [routerLink]="['/profile', seg.value.slice(1)]">{{ seg.value }}</a>
+    <span
+      *ngSwitchCase="'hashtag'"
+      class="hashtag">{{ seg.value }}</span>
+    <ng-container *ngSwitchDefault>{{ seg.value }}</ng-container>
+  </ng-container>
+</ng-container>

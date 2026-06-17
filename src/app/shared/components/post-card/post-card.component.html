@@ -1,37 +1,198 @@
 <article class="post-card">
   <header class="post-header">
     <a [routerLink]="['/profile', post.authorUsername]" class="author">
-      {{ '@' + post.authorUsername }}
+      <div class="avatar letter">{{ post.authorUsername[0].toUpperCase() }}</div>
+      <div class="author-meta">
+        <span class="username">{{ '@' + post.authorUsername }}</span>
+        <span class="time" [title]="post.createdAt | date:'medium'">
+          {{ post.createdAt | naturalTime }}
+        </span>
+      </div>
     </a>
-    <span class="time">{{ post.createdAt | date:'short' }}</span>
+
+    <div class="menu-wrap" *ngIf="isOwner && !editing">
+      <button class="icon-btn" (click)="toggleMenu($event)" title="Seçenekler">
+        <span class="material-symbols-rounded">more_horiz</span>
+      </button>
+      <div class="menu" *ngIf="menuOpen">
+        <button (click)="startEdit()">
+          <span class="material-symbols-rounded">edit</span>
+          Düzenle
+        </button>
+        <button class="danger" (click)="deletePost()">
+          <span class="material-symbols-rounded">delete</span>
+          Sil
+        </button>
+      </div>
+    </div>
   </header>
 
-  <p class="content">{{ post.content }}</p>
+  <!-- VIEW MODE -->
+  <ng-container *ngIf="!editing">
+    <p class="content" *ngIf="post.content">
+      <app-formatted-text [text]="post.content"></app-formatted-text>
+    </p>
 
-  <img *ngIf="post.photoUrl" [src]="post.photoUrl" alt="post" class="photo" />
+    <div class="carousel-wrap" *ngIf="photos.length">
+      <div class="carousel" #carousel (scroll)="onCarouselScroll()">
+        <div class="slide" *ngFor="let url of photos">
+          <img [src]="url" alt="" />
+        </div>
+      </div>
 
-  <div class="actions">
-    <button (click)="toggleLike()" [class.liked]="isLiked">
-      {{ isLiked ? '♥' : '♡' }} {{ post.likes.length }}
-    </button>
-    <span class="count">{{ post.comments.length }} yorum</span>
-  </div>
+      <button
+        *ngIf="photos.length > 1 && activeSlide > 0"
+        class="nav-btn prev"
+        (click)="prevSlide()" title="Önceki">
+        <span class="material-symbols-rounded">chevron_left</span>
+      </button>
+      <button
+        *ngIf="photos.length > 1 && activeSlide < photos.length - 1"
+        class="nav-btn next"
+        (click)="nextSlide()" title="Sonraki">
+        <span class="material-symbols-rounded">chevron_right</span>
+      </button>
 
-  <section class="comments" *ngIf="post.comments.length">
-    <div *ngFor="let c of post.comments" class="comment">
-      <a [routerLink]="['/profile', c.authorUsername]" class="author-sm">
-        {{ '@' + c.authorUsername }}
-      </a>
-      <span class="comment-text">{{ c.content }}</span>
+      <div class="counter" *ngIf="photos.length > 1">
+        {{ activeSlide + 1 }} / {{ photos.length }}
+      </div>
+
+      <div class="dots" *ngIf="photos.length > 1">
+        <span
+          class="dot"
+          *ngFor="let _ of photos; let i = index"
+          [class.active]="i === activeSlide"
+          (click)="goToSlide(i)"></span>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- EDIT MODE -->
+  <section class="edit-mode" *ngIf="editing">
+    <div class="edit-textarea-wrap">
+      <textarea
+        name="editContent"
+        rows="3"
+        placeholder="Yazını düzenle..."
+        [maxlength]="maxPostChars"
+        [(ngModel)]="editContent"></textarea>
+      <span class="char-counter">{{ editPostRemaining }}</span>
+    </div>
+
+    <div class="edit-photo-row">
+      <span class="material-symbols-rounded">image</span>
+      <input
+        type="text"
+        name="editPhoto"
+        placeholder="Fotoğraf URL ekle"
+        [(ngModel)]="editDraftPhotoUrl"
+        (keydown.enter)="$event.preventDefault(); addEditPhoto()"
+        [disabled]="editPhotoUrls.length >= maxPhotos" />
+      <button
+        type="button"
+        class="add-btn"
+        (click)="addEditPhoto()"
+        [disabled]="!editDraftPhotoUrl.trim() || editPhotoUrls.length >= maxPhotos">
+        <span class="material-symbols-rounded">add</span>
+      </button>
+    </div>
+
+    <div class="edit-photo-grid" *ngIf="editPhotoUrls.length">
+      <div class="edit-photo-thumb" *ngFor="let url of editPhotoUrls; let i = index">
+        <img [src]="url" alt="" />
+        <button
+          type="button"
+          class="remove-btn"
+          (click)="removeEditPhoto(i)">
+          <span class="material-symbols-rounded">close</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="edit-actions">
+      <span class="photo-counter">{{ editPhotoUrls.length }} / {{ maxPhotos }} fotoğraf</span>
+      <div class="btn-group">
+        <button class="ghost-btn" (click)="cancelEdit()">İptal</button>
+        <button class="danger-btn" (click)="deletePost()">
+          <span class="material-symbols-rounded">delete</span>
+          Sil
+        </button>
+        <button
+          class="primary-btn"
+          (click)="saveEdit()"
+          [disabled]="!editContent.trim()">
+          <span class="material-symbols-rounded">check</span>
+          Kaydet
+        </button>
+      </div>
     </div>
   </section>
 
-  <form class="comment-form" (ngSubmit)="submitComment()">
-    <input
-      type="text"
-      name="comment"
-      placeholder="Yorum yaz..."
-      [(ngModel)]="commentText" />
-    <button type="submit" [disabled]="!commentText.trim()">Gönder</button>
+  <div class="actions" *ngIf="!editing">
+    <button class="action-btn" (click)="toggleLike()" [class.liked]="isLiked">
+      <span class="material-symbols-rounded" [class.filled]="isLiked">favorite</span>
+      <span class="count">{{ post.likes.length }}</span>
+    </button>
+
+    <div class="action-btn static">
+      <span class="material-symbols-rounded">chat_bubble</span>
+      <span class="count">{{ post.comments.length }}</span>
+    </div>
+  </div>
+
+  <section class="comments" *ngIf="post.comments.length && !editing">
+    <div *ngFor="let c of post.comments" class="comment">
+      <ng-container *ngIf="editingCommentId !== c.commentId; else editCommentTpl">
+        <a [routerLink]="['/profile', c.authorUsername]" class="author-sm">
+          {{ '@' + c.authorUsername }}
+        </a>
+        <span class="comment-text">
+          <app-formatted-text [text]="c.content"></app-formatted-text>
+        </span>
+        <div class="comment-tools" *ngIf="isCommentOwner(c.authorUsername)">
+          <button class="tiny-btn" (click)="startCommentEdit(c.commentId, c.content)" title="Düzenle">
+            <span class="material-symbols-rounded">edit</span>
+          </button>
+          <button class="tiny-btn danger" (click)="deleteComment(c.commentId)" title="Sil">
+            <span class="material-symbols-rounded">delete</span>
+          </button>
+        </div>
+      </ng-container>
+      <ng-template #editCommentTpl>
+        <div class="comment-edit">
+          <input
+            type="text"
+            [maxlength]="maxCommentChars"
+            [(ngModel)]="editingCommentText" />
+          <button class="tiny-btn" (click)="saveCommentEdit(c.commentId)" title="Kaydet">
+            <span class="material-symbols-rounded">check</span>
+          </button>
+          <button class="tiny-btn" (click)="cancelCommentEdit()" title="İptal">
+            <span class="material-symbols-rounded">close</span>
+          </button>
+        </div>
+      </ng-template>
+    </div>
+  </section>
+
+  <form class="comment-form" *ngIf="!editing" (ngSubmit)="submitComment()">
+    <div class="input-wrap">
+      <span class="material-symbols-rounded">add_comment</span>
+      <app-mention-input
+        class="grow"
+        [text]="commentText"
+        (textChange)="commentText = $event"
+        (enterPressed)="submitComment()"
+        placeholder="Yorum yaz..."
+        [maxlength]="maxCommentChars"
+        name="comment">
+      </app-mention-input>
+      <span class="comment-counter" *ngIf="commentText.length > 0">
+        {{ commentRemaining }}
+      </span>
+    </div>
+    <button type="submit" class="send-btn" [disabled]="!commentText.trim()" title="Gönder">
+      <span class="material-symbols-rounded">send</span>
+    </button>
   </form>
 </article>

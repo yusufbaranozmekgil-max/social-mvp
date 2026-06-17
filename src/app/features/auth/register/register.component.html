@@ -1,28 +1,63 @@
-<div class="auth-container">
-  <form class="auth-card" (ngSubmit)="onSubmit()" #f="ngForm">
-    <h2>Kayıt Ol</h2>
+<div class="auth-shell">
+  <div class="auth-card">
+    <div class="auth-brand">
+      <span class="material-symbols-rounded">share</span>
+    </div>
+    <h1>Aramıza katıl</h1>
+    <p class="subtitle">Birkaç saniye sürer, hesabını oluştur ve paylaşmaya başla.</p>
 
-    <label>
-      Kullanıcı Adı
-      <input type="text" name="username" [(ngModel)]="username" required />
-    </label>
+    <form (ngSubmit)="onSubmit()" #f="ngForm" class="auth-form">
+      <label class="field">
+        <span class="label">Kullanıcı adı</span>
+        <div class="input-wrap">
+          <span class="material-symbols-rounded">person</span>
+          <input
+            type="text"
+            name="username"
+            [(ngModel)]="username"
+            autocomplete="username"
+            required />
+        </div>
+      </label>
 
-    <label>
-      E-posta
-      <input type="email" name="email" [(ngModel)]="email" required />
-    </label>
+      <label class="field">
+        <span class="label">E-posta</span>
+        <div class="input-wrap">
+          <span class="material-symbols-rounded">mail</span>
+          <input
+            type="email"
+            name="email"
+            [(ngModel)]="email"
+            autocomplete="email"
+            required />
+        </div>
+      </label>
 
-    <label>
-      Şifre
-      <input type="password" name="password" [(ngModel)]="password" required />
-    </label>
+      <label class="field">
+        <span class="label">Şifre</span>
+        <div class="input-wrap">
+          <span class="material-symbols-rounded">lock</span>
+          <input
+            type="password"
+            name="password"
+            [(ngModel)]="password"
+            autocomplete="new-password"
+            required />
+        </div>
+      </label>
 
-    <p class="error" *ngIf="error">{{ error }}</p>
+      <div class="error" *ngIf="error">
+        <span class="material-symbols-rounded">error</span>
+        {{ error }}
+      </div>
 
-    <button type="submit" [disabled]="f.invalid">Kayıt Ol</button>
+      <button type="submit" class="primary-btn" [disabled]="f.invalid">
+        Kayıt Ol
+      </button>
+    </form>
 
     <p class="switch">
-      Zaten hesabın var mı? <a routerLink="/login">Giriş Yap</a>
+      Zaten hesabın var mı? <a routerLink="/login">Giriş yap</a>
     </p>
-  </form>
+  </div>
 </div>

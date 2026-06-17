@@ -37,6 +37,9 @@ export class AuthService {
       bio: '',
       profilePhotoUrl: '',
       following: [],
+      followRequests: [],
+      notifications: [],
+      isPrivate: false,
       createdAt: Date.now()
     };
 

@@ -1,0 +1,23 @@
+<div class="overlay" *ngIf="state$ | async as state" (click)="answer(false)">
+  <div class="dialog" (click)="$event.stopPropagation()">
+    <div class="icon" [class.danger]="state.danger">
+      <span class="material-symbols-rounded">
+        {{ state.danger ? 'warning' : 'help' }}
+      </span>
+    </div>
+    <h3>{{ state.title }}</h3>
+    <p>{{ state.message }}</p>
+
+    <div class="actions">
+      <button class="ghost-btn" (click)="answer(false)">
+        {{ state.cancelText }}
+      </button>
+      <button
+        class="confirm-btn"
+        [class.danger]="state.danger"
+        (click)="answer(true)">
+        {{ state.confirmText }}
+      </button>
+    </div>
+  </div>
+</div>

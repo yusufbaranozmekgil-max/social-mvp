@@ -1,0 +1,79 @@
+<div class="settings-shell" *ngIf="currentUser$ | async as user">
+  <header class="head">
+    <h1>
+      <span class="material-symbols-rounded">settings</span>
+      Ayarlar
+    </h1>
+  </header>
+
+  <section class="card">
+    <div class="row-head">
+      <h2>Tema</h2>
+      <p class="hint">Arayüzün rengini buradan değiştir.</p>
+    </div>
+    <div class="theme-options">
+      <button
+        type="button"
+        class="theme-card"
+        [class.active]="(themeService.theme$ | async) === 'light'"
+        (click)="setTheme('light')">
+        <span class="material-symbols-rounded">light_mode</span>
+        <span>Açık</span>
+      </button>
+      <button
+        type="button"
+        class="theme-card"
+        [class.active]="(themeService.theme$ | async) === 'dark'"
+        (click)="setTheme('dark')">
+        <span class="material-symbols-rounded">dark_mode</span>
+        <span>Koyu</span>
+      </button>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="row-head">
+      <h2>Gizlilik</h2>
+      <p class="hint">
+        Gizli hesap olduğunda paylaşımlarını ve takipçi listeni yalnızca onayladığın takipçiler görür.
+      </p>
+    </div>
+    <button
+      type="button"
+      class="toggle-row"
+      [class.on]="user.isPrivate"
+      (click)="togglePrivacy()">
+      <div class="toggle-text">
+        <span class="material-symbols-rounded">{{ user.isPrivate ? 'lock' : 'public' }}</span>
+        <span>{{ user.isPrivate ? 'Gizli Hesap' : 'Herkese Açık' }}</span>
+      </div>
+      <span class="switch"><span class="dot"></span></span>
+    </button>
+  </section>
+
+  <section class="card collapsible" [class.open]="showAccountInfo">
+    <button class="row-head expandable" (click)="toggleAccountInfo()">
+      <div>
+        <h2>Hesap Bilgileri</h2>
+        <p class="hint">Kullanıcı adın, e-posta ve kayıt tarihi.</p>
+      </div>
+      <span class="material-symbols-rounded chevron">
+        {{ showAccountInfo ? 'expand_less' : 'expand_more' }}
+      </span>
+    </button>
+    <div class="info-list" *ngIf="showAccountInfo">
+      <div class="info-row">
+        <span class="label">Kullanıcı Adı</span>
+        <span class="value">{{ '@' + user.username }}</span>
+      </div>
+      <div class="info-row">
+        <span class="label">E-posta</span>
+        <span class="value">{{ user.email }}</span>
+      </div>
+      <div class="info-row">
+        <span class="label">Kayıt Tarihi</span>
+        <span class="value">{{ user.createdAt | date:'mediumDate' }}</span>
+      </div>
+    </div>
+  </section>
+</div>
