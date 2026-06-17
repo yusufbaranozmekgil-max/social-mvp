@@ -55,6 +55,9 @@ export class PostCardComponent {
   editingCommentId: string | null = null;
   editingCommentText = '';
 
+  showLikesModal = false;
+  likedUsers: { username: string; profilePhotoUrl: string }[] = [];
+
   get currentUsername(): string {
     return this.auth.currentUser?.username ?? '';
   }
@@ -69,6 +72,14 @@ export class PostCardComponent {
 
   get isBookmarked(): boolean {
     return this.userService.isBookmarked(this.currentUsername, this.post.id);
+  }
+
+  get likePreviewText(): string | null {
+    const likes = this.post.likes;
+    if (!likes.length) return null;
+    const last = likes[likes.length - 1];
+    if (likes.length === 1) return `@${last} beğendi`;
+    return `@${last} ve ${likes.length - 1} kişi daha beğendi`;
   }
 
   get photos(): string[] {
@@ -93,6 +104,19 @@ export class PostCardComponent {
     if (!this.currentUsername) return;
     const updated = this.postService.toggleLike(this.post.id, this.currentUsername);
     if (updated) this.post = { ...updated };
+  }
+
+  openLikesModal(): void {
+    if (!this.post.likes.length) return;
+    this.likedUsers = [...this.post.likes].reverse().map(username => {
+      const user = this.userService.getByUsername(username);
+      return { username, profilePhotoUrl: user?.profilePhotoUrl ?? '' };
+    });
+    this.showLikesModal = true;
+  }
+
+  closeLikesModal(): void {
+    this.showLikesModal = false;
   }
 
   toggleBookmark(): void {
@@ -133,6 +157,7 @@ export class PostCardComponent {
 
   @HostListener('document:keydown.escape')
   onEscape(): void {
+    if (this.showLikesModal) { this.showLikesModal = false; return; }
     if (this.menuOpen) this.menuOpen = false;
   }
 

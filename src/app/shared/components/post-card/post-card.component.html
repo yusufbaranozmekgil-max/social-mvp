@@ -144,6 +144,41 @@
     </button>
   </div>
 
+  <button *ngIf="likePreviewText && !editing" class="like-preview" (click)="openLikesModal()">
+    <span class="material-symbols-rounded like-preview-icon">favorite</span>
+    {{ likePreviewText }}
+  </button>
+
+  <!-- Beğenenler Modalı -->
+  <div class="likes-overlay" *ngIf="showLikesModal" (click)="closeLikesModal()">
+    <div class="likes-modal" (click)="$event.stopPropagation()">
+      <div class="likes-modal-head">
+        <h3>
+          <span class="material-symbols-rounded">favorite</span>
+          Beğenenler
+        </h3>
+        <button class="icon-btn" (click)="closeLikesModal()">
+          <span class="material-symbols-rounded">close</span>
+        </button>
+      </div>
+      <div class="likes-list">
+        <a
+          *ngFor="let u of likedUsers"
+          [routerLink]="['/profile', u.username]"
+          class="likes-user"
+          (click)="closeLikesModal()">
+          <ng-container *ngIf="u.profilePhotoUrl; else likeLetterAvatar">
+            <img [src]="u.profilePhotoUrl" class="likes-avatar" alt="" />
+          </ng-container>
+          <ng-template #likeLetterAvatar>
+            <div class="likes-avatar letter">{{ u.username[0].toUpperCase() }}</div>
+          </ng-template>
+          <span class="likes-username">{{ '@' + u.username }}</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
   <section class="comments" *ngIf="post.comments.length && !editing">
     <div *ngFor="let c of post.comments" class="comment">
       <ng-container *ngIf="editingCommentId !== c.commentId; else editCommentTpl">
