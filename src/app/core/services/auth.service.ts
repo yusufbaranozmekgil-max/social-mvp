@@ -40,6 +40,7 @@ export class AuthService {
       followRequests: [],
       notifications: [],
       isPrivate: false,
+      bookmarks: [],
       createdAt: Date.now()
     };
 

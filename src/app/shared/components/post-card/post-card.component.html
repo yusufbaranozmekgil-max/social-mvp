@@ -138,6 +138,10 @@
       <span class="material-symbols-rounded">chat_bubble</span>
       <span class="count">{{ post.comments.length }}</span>
     </div>
+
+    <button class="action-btn bookmark-btn" (click)="toggleBookmark()" [class.bookmarked]="isBookmarked" title="{{ isBookmarked ? 'Kaydı kaldır' : 'Kaydet' }}">
+      <span class="material-symbols-rounded" [class.filled]="isBookmarked">bookmark</span>
+    </button>
   </div>
 
   <section class="comments" *ngIf="post.comments.length && !editing">

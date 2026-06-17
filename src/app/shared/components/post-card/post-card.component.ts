@@ -13,6 +13,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { PostService } from '../../../core/services/post.service';
+import { UserService } from '../../../core/services/user.service';
 import { ConfirmService } from '../../../core/services/confirm.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { Post } from '../../../core/models/post.model';
@@ -30,6 +31,7 @@ import { NaturalTimePipe } from '../../pipes/natural-time.pipe';
 export class PostCardComponent {
   private auth = inject(AuthService);
   private postService = inject(PostService);
+  private userService = inject(UserService);
   private confirm = inject(ConfirmService);
   private toast = inject(ToastService);
 
@@ -65,6 +67,10 @@ export class PostCardComponent {
     return this.post.likes.includes(this.currentUsername);
   }
 
+  get isBookmarked(): boolean {
+    return this.userService.isBookmarked(this.currentUsername, this.post.id);
+  }
+
   get photos(): string[] {
     if (this.post.photoUrls?.length) return this.post.photoUrls;
     if (this.post.photoUrl) return [this.post.photoUrl];
@@ -87,6 +93,13 @@ export class PostCardComponent {
     if (!this.currentUsername) return;
     const updated = this.postService.toggleLike(this.post.id, this.currentUsername);
     if (updated) this.post = { ...updated };
+  }
+
+  toggleBookmark(): void {
+    if (!this.currentUsername) return;
+    const wasBookmarked = this.isBookmarked;
+    this.userService.toggleBookmark(this.currentUsername, this.post.id);
+    this.toast.success(wasBookmarked ? 'Kayıt kaldırıldı' : 'Kaydedildi');
   }
 
   submitComment(): void {

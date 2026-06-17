@@ -35,16 +35,39 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
   postLimit = this.pageSize;
   notFound = false;
 
+  activeTab: 'posts' | 'liked' | 'bookmarks' = 'posts';
+
+  get tabPosts(): Post[] {
+    if (this.activeTab === 'liked') {
+      const allPosts = this.postService.getAll();
+      return allPosts.filter(p => this.user && p.likes.includes(this.user.username));
+    }
+    if (this.activeTab === 'bookmarks') {
+      const bookmarks = this.user?.bookmarks ?? [];
+      const allPosts = this.postService.getAll();
+      return bookmarks
+        .map(id => allPosts.find(p => p.id === id))
+        .filter((p): p is Post => !!p)
+        .reverse();
+    }
+    return this.posts;
+  }
+
   get visiblePosts(): Post[] {
-    return this.posts.slice(0, this.postLimit);
+    return this.tabPosts.slice(0, this.postLimit);
   }
 
   get hasMorePosts(): boolean {
-    return this.posts.length > this.postLimit;
+    return this.tabPosts.length > this.postLimit;
   }
 
   loadMorePosts(): void {
     this.postLimit += this.pageSize;
+  }
+
+  setTab(tab: 'posts' | 'liked' | 'bookmarks'): void {
+    this.activeTab = tab;
+    this.postLimit = this.pageSize;
   }
 
   editing = false;
@@ -76,6 +99,7 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
   private load(username: string): void {
     this.editing = false;
     this.postLimit = this.pageSize;
+    this.activeTab = 'posts';
     const found = this.userService.getByUsername(username);
     if (!found) {
       this.user = null;

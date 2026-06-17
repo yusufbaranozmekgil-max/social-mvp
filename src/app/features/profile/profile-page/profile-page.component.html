@@ -106,11 +106,28 @@
   </section>
 
   <section class="posts" *ngIf="canSeeContent">
-    <h2>Paylaşımlar</h2>
-    <div *ngIf="posts.length === 0" class="empty">
-      <span class="material-symbols-rounded">inbox</span>
-      Henüz post paylaşılmamış.
+    <div class="tabs">
+      <button class="tab-btn" [class.active]="activeTab === 'posts'" (click)="setTab('posts')">
+        <span class="material-symbols-rounded">grid_on</span>
+        Paylaşımlar
+      </button>
+      <button class="tab-btn" [class.active]="activeTab === 'liked'" (click)="setTab('liked')">
+        <span class="material-symbols-rounded">favorite</span>
+        Beğenilenler
+      </button>
+      <button *ngIf="isOwnProfile" class="tab-btn" [class.active]="activeTab === 'bookmarks'" (click)="setTab('bookmarks')">
+        <span class="material-symbols-rounded">bookmark</span>
+        Kaydedilenler
+      </button>
     </div>
+
+    <div *ngIf="visiblePosts.length === 0" class="empty">
+      <span class="material-symbols-rounded">
+        {{ activeTab === 'liked' ? 'favorite' : (activeTab === 'bookmarks' ? 'bookmark' : 'inbox') }}
+      </span>
+      {{ activeTab === 'liked' ? 'Henüz beğenilen post yok.' : (activeTab === 'bookmarks' ? 'Henüz kaydedilen post yok.' : 'Henüz post paylaşılmamış.') }}
+    </div>
+
     <app-post-card
       *ngFor="let post of visiblePosts"
       [post]="post"

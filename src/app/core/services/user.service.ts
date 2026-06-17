@@ -293,13 +293,36 @@ export class UserService {
     return user?.following?.length ?? 0;
   }
 
+  toggleBookmark(username: string, postId: string): User | null {
+    const users = this.storage.get<User[]>(USERS_KEY) ?? [];
+    const idx = users.findIndex(u => u.username === username);
+    if (idx === -1) return null;
+    const me = this.normalize(users[idx]);
+    const already = me.bookmarks.includes(postId);
+    me.bookmarks = already
+      ? me.bookmarks.filter(id => id !== postId)
+      : [...me.bookmarks, postId];
+    users[idx] = me;
+    this.storage.set(USERS_KEY, users);
+    if (this.auth.currentUser?.username === username) {
+      this.auth.syncCurrentUser(me);
+    }
+    return me;
+  }
+
+  isBookmarked(username: string, postId: string): boolean {
+    const user = this.getByUsername(username);
+    return user?.bookmarks?.includes(postId) ?? false;
+  }
+
   private normalize(user: User): User {
     return {
       ...user,
       following: user.following ?? [],
       followRequests: user.followRequests ?? [],
       notifications: user.notifications ?? [],
-      isPrivate: user.isPrivate ?? false
+      isPrivate: user.isPrivate ?? false,
+      bookmarks: user.bookmarks ?? []
     };
   }
 
